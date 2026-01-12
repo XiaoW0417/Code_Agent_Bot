@@ -33,16 +33,16 @@ Code Agent Bot 该项目采用了类似 Claude Code 的工作流（Plan -> Imple
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/yourusername/Agent_Bot_l2.git
-cd Agent_Bot_l2
+git clone https://github.com/XiaoW0417/Code_Agent_Bot
+cd Code_Agent_Bot
 
 # 2. 创建并激活虚拟环境 (使用 uv)
-uv venv
+uv venv --python 3.13
 source .venv/bin/activate  # macOS/Linux
 # .venv\Scripts\activate   # Windows
 
 # 3. 安装依赖
-uv pip install -r requirements.txt
+uv sync
 ```
 
 ### 3. 配置环境变量
@@ -50,9 +50,9 @@ uv pip install -r requirements.txt
 在项目根目录创建 `.env` 文件（参考 `.env.example`）：
 
 ```ini
-OPENAI_API_KEY=sk-your-api-key-here
-OPENAI_BASE_URL=https://api.openai.com/v1  # 可选，支持兼容 OpenAI 接口的模型
-OPENAI_MODEL_NAME=gpt-4o                   # 可选
+OPENAI_API_KEY=""
+OPENAI_BASE_URL=""                   # 可选，支持兼容 OpenAI 接口的模型
+OPENAI_MODEL_NAME=""                 # 可选
 ```
 
 ### 4. 运行 Agent
@@ -60,7 +60,7 @@ OPENAI_MODEL_NAME=gpt-4o                   # 可选
 启动交互式 CLI：
 
 ```bash
-python main.py
+uv run main.py
 ```
 
 ---
@@ -118,7 +118,7 @@ src/
 
 ## 🛠️ 贡献指南 (Contributing)
 
-欢迎扩展 Agent Bot 的能力！
+欢迎扩展 Code Agent Bot 的能力！
 
 ### 如何新增 Skill
 
@@ -132,15 +132,3 @@ src/
 *   新增功能需附带相应的测试用例（如适用）。
 *   提交 PR 前请更新相关文档。
 
----
-
-## ❓ 常见问题 (FAQ)
-
-**Q: 为什么 Agent 有时会拒绝执行删除操作？**
-A: `DeleteResource` 是一个敏感操作。如果 Critic 认为删除操作可能导致数据丢失且未得到充分理由，它可能会阻止执行。请在指令中明确说明删除的原因。
-
-**Q: 如何查看详细的调试日志？**
-A: 系统默认将详细日志输出到 `stderr` 或日志文件，而将干净的交互界面保留在 `stdout`。你可以重定向 stderr 来查看底层通信细节。
-
-**Q: 支持哪些大模型？**
-A: 理论上支持所有兼容 OpenAI Chat Completion API 的模型（如 GPT-4, Claude 3.5 Sonnet via wrapper, DeepSeek 等）。建议使用推理能力较强的模型以获得最佳体验。
