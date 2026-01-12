@@ -1,11 +1,15 @@
+"""
+Timezone tool.
+"""
 import asyncio
 import logging
 from typing import TypedDict, Optional
 from datetime import datetime
 import httpx
 
-from ..errors import ToolExecutionError
+from src.core.exceptions import ToolExecutionError
 
+logger = logging.getLogger(__name__)
 
 class TimezoneResult(TypedDict):
     datetime: str
@@ -16,17 +20,17 @@ TIMEZ_TOOL_SCHEMA = {
     "type": "function",
     "function": {
         "name": "get_timezone_time",
-        "description": "获取指定 IANA 时区的当前时间。",
+        "description": "Get current time for a specific IANA timezone.",
         "parameters": {
             "type": "object",
             "properties": {
                 "timezone": {
                     "type": "string",
-                    "description": "IANA 时区名称，例如 'Asia/Shanghai' 或 'America/New_York'。",
+                    "description": "IANA timezone name (e.g. 'Asia/Shanghai', 'America/New_York').",
                 },
                 "format": {
                     "type": "string",
-                    "description": "可选的时间格式化字符串。",
+                    "description": "Optional format string.",
                 },
             },
             "required": ["timezone"],
@@ -38,13 +42,9 @@ TIMEZ_TOOL_SCHEMA = {
 async def get_timezone_time(
     timezone: str, format: Optional[str] = None
 ) -> TimezoneResult:
-    """
-    获取指定时区的当前时间。
-    使用 worldtimeapi.org
-    """
+    """Get current time in timezone."""
     api_url = f"https://worldtimeapi.org/api/timezone/{timezone}"
 
-    
     timeout = httpx.Timeout(
         connect=3.0,
         read=5.0,
@@ -54,6 +54,7 @@ async def get_timezone_time(
 
     async with httpx.AsyncClient(timeout=timeout, trust_env=True) as client:
         try:
+            # Simple retry logic from original code
             while True:
                 try:
                     response = await client.get(api_url)
@@ -61,11 +62,11 @@ async def get_timezone_time(
                     break
                 except Exception as e:
                     wait = 0.3
-                    logging.info(f"请求失败: {e}，{wait}s 后重试")
+                    logger.info(f"Request failed: {e}, retrying in {wait}s")
                     await asyncio.sleep(wait)
+            
             data = response.json()
-
-            iso_time = data["datetime"]  # worldtimeapi 原生 ISO 8601
+            iso_time = data["datetime"]
 
             dt_object = datetime.fromisoformat(
                 iso_time.replace("Z", "+00:00")
@@ -84,36 +85,16 @@ async def get_timezone_time(
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 raise ToolExecutionError(
-                    tool_name="get_timezone_time",
-                    error_msg=f"找不到时区 '{timezone}'。请使用有效的 IANA 时区名称。"
+                    "get_timezone_time",
+                    f"Timezone '{timezone}' not found."
                 )
             raise ToolExecutionError(
-                tool_name="get_timezone_time",
-                error_msg=f"worldtimeapi 请求失败: {e.response.status_code}"
+                "get_timezone_time",
+                f"API request failed: {e.response.status_code}"
             )
 
         except Exception as e:
             raise ToolExecutionError(
-                tool_name="get_timezone_time",
-                error_msg=f"获取时间时出错: {str(e)}"
+                "get_timezone_time",
+                f"Error getting time: {str(e)}"
             )
-
-
-if __name__ == "__main__":
-    from ..logging_setup import setup_logging
-    setup_logging()
-
-    async def main():
-        try:
-            result1 = await get_timezone_time("Asia/Tokyo")
-            logging.info(f"东京当前时间: {result1['datetime']}")
-
-            result2 = await get_timezone_time(
-                "America/New_York",
-                format="%Y-%m-%d %H:%M:%S"
-            )
-            logging.info(f"纽约当前时间: {result2['datetime']}")
-        except ToolExecutionError as e:
-            logging.error(e)
-
-    asyncio.run(main())
