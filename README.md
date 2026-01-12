@@ -1,12 +1,12 @@
-# Code Agent Bit
+# Code Agent Bot
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Architecture](https://img.shields.io/badge/Architecture-Skills--First-green)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
-Code Agent Bit 是一个基于 **Skills-First Architecture** 的智能编码助手。它不仅仅是一个简单的聊天机器人，更是一个能够理解复杂意图、自主规划任务、执行代码操作并自我修正的 AI Agent。
+Code Agent Bot 是一个基于 **Skills-First Architecture** 的智能编码助手。它不仅仅是一个简单的聊天机器人，更是一个能够理解复杂意图、自主规划任务、执行代码操作并自我修正的 AI Agent。
 
-Code Agent Bit 该项目采用了类似 Claude Code 的工作流（Plan -> Implement -> Reflect -> Iterate），通过 **Orchestrator** 协调 **Planner** (规划)、**Executor** (执行) 和 **Critic** (审查) 三大核心组件，为开发者提供强大的自动化辅助能力。
+Code Agent Bot 该项目采用了类似 Claude Code 的工作流（Plan -> Implement -> Reflect -> Iterate），通过 **Orchestrator** 协调 **Planner** (规划)、**Executor** (执行) 和 **Critic** (审查) 三大核心组件，为开发者提供强大的自动化辅助能力。
 
 ---
 
