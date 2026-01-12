@@ -1,200 +1,146 @@
-# Agent Bot (v2) - Next-Gen Multi-Agent Orchestration Framework
+# Agent Bot (Level 2)
 
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
-[![MCP Support](https://img.shields.io/badge/MCP-Enabled-orange)]()
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Skills--First-green)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
-**Agent Bot** 是一个现代化的、基于 **Model Context Protocol (MCP)** 的多智能体协作框架。它采用了 **Planner-Executor-Critic** 架构，融合了 Claude Code 的 "Plan -> Implement -> Reflect" 工作流，旨在提供稳定、可扩展且具备自我修正能力的 Agent 开发体验。
+Agent Bot (Level 2) 是一个基于 **Skills-First Architecture** 的智能编码助手。它不仅仅是一个简单的聊天机器人，更是一个能够理解复杂意图、自主规划任务、执行代码操作并自我修正的 AI Agent。
 
-无论是构建代码助手、数据分析机器人，还是复杂的任务自动化系统，Agent Bot 都能提供坚实的架构基础。
-
----
-
-## 🌟 核心特色 (Key Features)
-
-- **🧠 Planner-Executor-Critic 架构**: 
-  - **Architect (Planner)**: 负责高层任务拆解与结构化规划。
-  - **Coder (Executor)**: 负责执行具体步骤，调用工具。
-  - **Reviewer (Critic)**: 负责审查执行结果，确保任务质量，形成闭环。
-
-- **🔌 Model Context Protocol (MCP) 原生支持**:
-  - 抛弃传统的 Function Calling 耦合，采用标准化的 MCP 协议集成工具。
-  - 支持 **FileSystem**, **CodeAnalysis**, **ExternalServices** 等多种内置 MCP Server。
-  - 工具与 Agent 逻辑彻底解耦，易于扩展和复用。
-
-- **⚡️ 现代化的流式交互体验**:
-  - 基于 `Rich` 库构建的精美终端 UI。
-  - 实时展示 Agent 的思考过程、规划树和执行状态。
-  - 支持流式输出，打字机效果呈现最终回复。
-
-- **🛡️ 健壮的工程设计**:
-  - **自我修正**: Critic 发现问题后，Executor 会自动重试（支持指数退避）。
-  - **错误恢复**: 内置针对 LLM API (如 429 Rate Limit) 的自动重试机制。
-  - **类型安全**: 全面使用 Python 类型提示和 Pydantic/Dataclass。
+该项目采用了类似 Claude Code 的工作流（Plan -> Implement -> Reflect -> Iterate），通过 **Orchestrator** 协调 **Planner** (规划)、**Executor** (执行) 和 **Critic** (审查) 三大核心组件，为开发者提供强大的自动化辅助能力。
 
 ---
 
-## 🏗️ 系统架构 (Architecture)
+## 📖 核心功能 (Core Features)
 
-```mermaid
-graph TD
-    User[User Input] --> Orchestrator
-    Orchestrator -->|1. Plan| Planner
-    Planner -->|Structured Plan| Orchestrator
-    
-    subgraph Execution Loop
-        Orchestrator -->|2. Execute Step| Executor
-        Executor <-->|MCP Protocol| MCPServers[MCP Servers]
-        Executor -->|Result| Orchestrator
-        
-        Orchestrator -->|3. Reflect| Critic
-        Critic -->|Feedback| Orchestrator
-        Orchestrator -.->|Retry if Rejected| Executor
-    end
-    
-    Orchestrator -->|4. Final Response| User
-```
-
----
-
-## 🛠️ 技术栈 (Tech Stack)
-
-- **核心语言**: Python 3.10+
-- **LLM 交互**: `openai` (Async), `tenacity` (Retry)
-- **UI/CLI**: `rich`, `prompt_toolkit`
-- **工具协议**: MCP (Model Context Protocol) 概念实现
-- **依赖管理**: `uv` (推荐) 或 `pip`
+*   **智能规划 (Smart Planning)**: 理解模糊的高层需求，将其拆解为有序的、可执行的步骤。
+*   **技能驱动 (Skills-Based)**: 封装了文件操作、代码搜索、测试运行等高层能力，而非低级的 API 调用。
+*   **流式交互 (Streaming UI)**: 全链路支持 Markdown 流式输出，提供即时、美观的终端交互体验。
+*   **自我修正 (Self-Correction)**: 内置 Critic 角色，自动审查执行结果并提出修改建议。
+*   **安全沙箱 (Sandboxed)**: 所有文件操作均限制在安全目录内，并自动过滤敏感或无关文件（如 `.git`, `node_modules`）。
 
 ---
 
 ## 🚀 快速开始 (Quick Start)
 
-### 前置条件
+### 1. 环境要求
 
-- Python 3.10 或更高版本
-- 一个有效的 OpenAI API Key (或兼容的 API 服务，如 DeepSeek, Moonshot 等)
+*   Python 3.10 或更高版本
+*   [uv](https://github.com/astral-sh/uv) (推荐的项目管理工具)
 
-### 安装步骤
+### 2. 安装与配置
 
-1. **克隆仓库**
-   ```bash
-   git clone https://github.com/your-username/agent-bot.git
-   cd agent-bot
-   ```
-
-2. **创建虚拟环境**
-   ```bash
-   # 使用 uv (推荐)
-   uv venv
-   source .venv/bin/activate
-   
-   # 或使用 venv
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
-
-3. **安装依赖**
-   ```bash
-   # 使用 uv
-   uv sync
-   
-   # 或使用 pip
-   pip install -r requirements.txt
-   ```
-
-4. **配置环境变量**
-   复制示例配置并填入你的 API Key：
-   ```bash
-   cp .env.example .env
-   ```
-   编辑 `.env` 文件：
-   ```ini
-   OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
-   OPENAI_BASE_URL="https://api.openai.com/v1"  # 可选，用于自定义接入点
-   OPENAI_MODEL_NAME="gpt-4-turbo"              # 默认模型
-   ```
-
-### 运行 Agent
+我们强烈推荐使用 `uv` 进行依赖管理和环境配置。
 
 ```bash
-# 使用 uv
-uv run main.py
+# 1. 克隆项目
+git clone https://github.com/yourusername/Agent_Bot_l2.git
+cd Agent_Bot_l2
 
-# 或直接运行
+# 2. 创建并激活虚拟环境 (使用 uv)
+uv venv
+source .venv/bin/activate  # macOS/Linux
+# .venv\Scripts\activate   # Windows
+
+# 3. 安装依赖
+uv pip install -r requirements.txt
+```
+
+### 3. 配置环境变量
+
+在项目根目录创建 `.env` 文件（参考 `.env.example`）：
+
+```ini
+OPENAI_API_KEY=sk-your-api-key-here
+OPENAI_BASE_URL=https://api.openai.com/v1  # 可选，支持兼容 OpenAI 接口的模型
+OPENAI_MODEL_NAME=gpt-4o                   # 可选
+```
+
+### 4. 运行 Agent
+
+启动交互式 CLI：
+
+```bash
 python main.py
 ```
 
 ---
 
-## 📖 使用指南 (Usage)
+## 💡 使用指南 (Usage Guide)
 
-启动后，你将进入一个交互式的 CLI 界面。
+Agent 支持两种交互模式，系统会自动根据输入内容进行判断：
 
-### 基础对话
-直接输入你的需求，Agent 会自动规划并执行：
-```text
-> 帮我查询北京现在的天气，并把结果保存到 weather.txt 文件中。
-```
+### 1. 快速通道 (Fast Path)
+适用于无需复杂操作的直接问答。
+> **User**: "解释一下 Python 的 GIL 是什么？"
+> **Agent**: (直接流式输出解释)
 
-### 切换模型 (@model)
-在会话中动态切换 LLM 模型：
-```text
-> @gpt-4o 帮我写一个 Python 贪吃蛇游戏
-```
+### 2. 复杂任务 (Complex Path)
+涉及文件操作、代码分析或多步骤执行的任务。系统会自动进入规划模式。
+> **User**: "分析当前项目结构，并在 README.md 中生成一个概要。"
+> **Agent**:
+> 1.  **Architect**: 生成 Markdown 格式的执行计划（流式显示）。
+> 2.  **Executor**: 调用 `ExploreProject` 技能扫描文件。
+> 3.  **Executor**: 调用 `EditFile` 技能更新 README。
+> 4.  **Critic**: 审查操作结果。
 
-### 引用文件 (#file)
-将本地文件作为上下文提供给 Agent：
-```text
-> 请分析 #data/report.csv 中的销售数据
-```
+### 可用技能 (Available Skills)
 
-### 退出
-输入 `exit` 或 `quit` 退出程序。
-
----
-
-## 🧩 目录结构 (Directory Structure)
-
-```
-agent-bot/
-├── docs/               # 文档
-├── sandbox/            # Agent 的文件操作沙箱目录
-├── src/
-│   ├── core/           # 核心逻辑 (Agent, Planner, Executor, MCP Base)
-│   ├── infra/          # 基础设施 (LLM Adapter, Logging, MCP Servers)
-│   ├── interface/      # 接口层 (CLI, UI)
-│   └── main.py         # 入口文件
-├── .env.example        # 环境变量示例
-└── README.md           # 项目说明
-```
+| 技能名称 | 描述 |
+| :--- | :--- |
+| `ExploreProject` | 智能探索项目结构，自动过滤噪音文件。 |
+| `ViewFile` | 读取并展示文件内容。 |
+| `SearchCode` | 使用正则模式全局搜索代码。 |
+| `EditFile` | 创建、覆盖或追加内容到文件。 |
+| `DeleteResource` | 删除文件或目录（需谨慎）。 |
+| `RunTests` | 运行 pytest 测试套件并返回报告。 |
 
 ---
 
-## 🤝 贡献指南 (Contributing)
+## 📂 项目结构 (Project Structure)
 
-我们非常欢迎社区的贡献！
-
-1. Fork 本仓库。
-2. 创建你的特性分支 (`git checkout -b feature/AmazingFeature`)。
-3. 提交你的修改 (`git commit -m 'Add some AmazingFeature'`)。
-4. 推送到分支 (`git push origin feature/AmazingFeature`)。
-5. 打开一个 Pull Request。
-
----
-
-## 📄 许可证 (License)
-
-本项目采用 MIT 许可证。详情请参阅 [LICENSE](LICENSE) 文件。
-
----
-
-## 📞 联系方式 (Contact)
-
-如有任何问题或建议，欢迎提交 Issue 或通过以下方式联系：
-
-- **Email**: contact@example.com
-- **GitHub Issues**: [Issues Page](../../issues)
+```
+src/
+├── core/               # 核心智能体逻辑
+│   ├── skills/         # Skill 定义与注册 (High-Level 能力封装)
+│   ├── planner.py      # 规划器：负责任务拆解
+│   ├── executor.py     # 执行器：负责调用 Skills
+│   ├── critic.py       # 审查器：负责结果验收
+│   ├── orchestrator.py # 编排器：管理 Agent 协作流程
+│   └── analyzer.py     # 分析器：意图识别与路由
+├── infra/              # 基础设施层
+│   ├── tools/          # 底层原子工具 (文件系统、代码分析等)
+│   └── mcp/            # MCP (Model Context Protocol) 适配器
+└── interface/          # 交互层
+    └── ui/             # 基于 Rich 的高性能终端 UI
+```
 
 ---
 
-**Happy Coding with Agent Bot!** 🤖✨
+## 🛠️ 贡献指南 (Contributing)
+
+欢迎扩展 Agent Bot 的能力！
+
+### 如何新增 Skill
+
+1.  **定义**: 在 `src/core/skills/definitions.py` 中继承 `Skill` 基类，实现 `execute` 方法。
+2.  **注册**: 在 `src/core/skills/registry.py` 中将新 Skill 加入注册表。
+3.  **验证**: 运行 Agent，通过自然语言指令测试新能力。
+
+### 提交规范
+
+*   请确保代码通过 pylint 检查。
+*   新增功能需附带相应的测试用例（如适用）。
+*   提交 PR 前请更新相关文档。
+
+---
+
+## ❓ 常见问题 (FAQ)
+
+**Q: 为什么 Agent 有时会拒绝执行删除操作？**
+A: `DeleteResource` 是一个敏感操作。如果 Critic 认为删除操作可能导致数据丢失且未得到充分理由，它可能会阻止执行。请在指令中明确说明删除的原因。
+
+**Q: 如何查看详细的调试日志？**
+A: 系统默认将详细日志输出到 `stderr` 或日志文件，而将干净的交互界面保留在 `stdout`。你可以重定向 stderr 来查看底层通信细节。
+
+**Q: 支持哪些大模型？**
+A: 理论上支持所有兼容 OpenAI Chat Completion API 的模型（如 GPT-4, Claude 3.5 Sonnet via wrapper, DeepSeek 等）。建议使用推理能力较强的模型以获得最佳体验。
