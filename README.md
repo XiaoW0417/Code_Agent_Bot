@@ -30,8 +30,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/agent-bot.git
-cd agent-bot
+git clone https://github.com/XiaoW0417/Code_Agent_Bot.git
+cd Code_Agent_Bot
 
 # 配置环境变量
 cp .env.example .env
