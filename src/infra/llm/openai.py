@@ -77,9 +77,10 @@ class OpenAIProvider(LLMProvider):
         messages: List[Dict[str, Any]], 
         tools: Optional[List[Dict[str, Any]]] = None, 
         tool_choice: Any = "auto"
-    ) -> AsyncGenerator[str, None]:
+    ) -> AsyncGenerator[Any, None]:
         """
-        Stream content tokens.
+        Stream content tokens or tool calls.
+        Yields the raw chunk from OpenAI.
         """
         # Manual retry logic for generator since tenacity decorators don't work easily with async generators
         # We can implement a simple retry loop here.
@@ -103,9 +104,7 @@ class OpenAIProvider(LLMProvider):
                 stream = await self.client.chat.completions.create(**kwargs)
                 
                 async for chunk in stream:
-                    delta = chunk.choices[0].delta
-                    if delta.content:
-                        yield delta.content
+                    yield chunk
                 
                 return # Success, exit loop
 

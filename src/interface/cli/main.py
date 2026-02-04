@@ -3,7 +3,6 @@ CLI Entry point.
 """
 import asyncio
 import logging
-import sys
 import re
 
 from prompt_toolkit import PromptSession

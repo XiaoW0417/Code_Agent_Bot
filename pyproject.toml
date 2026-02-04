@@ -1,24 +1,123 @@
 [project]
 name = "agent-bot"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "AI-powered coding assistant with planning and execution capabilities"
 readme = "README.md"
-requires-python = ">=3.13.0"
-dependencies = [
-    "dotenv>=0.9.9",
-    "httpx>=0.28.1",
-    "openai>=2.14.0",
-    "prompt-toolkit>=3.0.52",
-    "pytest>=9.0.2",
-    "python-dotenv>=1.2.1",
-    "rich>=14.2.0",
-    "tenacity>=9.1.2",
-    "unidiff>=0.7.5",
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Code Agent Bot Team" }
+]
+keywords = ["ai", "agent", "llm", "coding-assistant", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
-[dependency-groups]
+dependencies = [
+    # Core
+    "python-dotenv>=1.0.0",
+    
+    # LLM
+    "openai>=1.0.0",
+    "tenacity>=8.0.0",
+    
+    # API Framework
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    
+    # Database
+    "sqlalchemy>=2.0.0",
+    
+    # HTTP Client
+    "httpx>=0.26.0",
+    
+    # CLI
+    "rich>=13.0.0",
+    "prompt-toolkit>=3.0.0",
+    
+    # Utils
+    "unidiff>=0.7.0",
+]
+
+[project.optional-dependencies]
 dev = [
-    "mypy>=1.19.1",
-    "pytest>=9.0.2",
-    "ruff>=0.14.10",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.0.0",
+    "httpx>=0.26.0",  # For TestClient
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+]
+
+postgres = [
+    "psycopg2-binary>=2.9.0",
+    "asyncpg>=0.29.0",
+]
+
+redis = [
+    "redis>=5.0.0",
+]
+
+[project.scripts]
+agent-bot = "src.interface.cli.main:main_sync"
+agent-api = "src.api.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
 ]

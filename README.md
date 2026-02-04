@@ -1,134 +1,129 @@
 # Code Agent Bot
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Architecture](https://img.shields.io/badge/Architecture-Skills--First-green)
-![Status](https://img.shields.io/badge/Status-Active-success)
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
+![React](https://img.shields.io/badge/React-18+-61DAFB)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-Code Agent Bot 是一个基于 **Skills-First Architecture** 的智能编码助手。它不仅仅是一个简单的聊天机器人，更是一个能够理解复杂意图、自主规划任务、执行代码操作并自我修正的 AI Agent。
+**Code Agent Bot** 是一个生产就绪的 AI 编码助手，采用 **Plan -> Execute -> Reflect -> Iterate** 工作流，为开发者提供强大的自动化辅助能力。
 
-Code Agent Bot 该项目采用了类似 Claude Code 的工作流（Plan -> Implement -> Reflect -> Iterate），通过 **Orchestrator** 协调 **Planner** (规划)、**Executor** (执行) 和 **Critic** (审查) 三大核心组件，为开发者提供强大的自动化辅助能力。
+## 核心特性
 
----
+- **智能规划**: 理解模糊需求，自动拆解为可执行步骤
+- **技能驱动**: 高层能力封装（文件操作、代码搜索、测试运行）
+- **自我修正**: Critic 审查机制自动修复执行错误
+- **流式输出**: 全链路 Markdown 流式渲染
+- **安全沙箱**: 文件操作限制在安全目录内
+- **现代化 UI**: 响应式 Web 界面，暗黑极客风格
+- **用户认证**: JWT 认证，会话持久化
+- **数据分析**: Token 使用量追踪和统计
 
-## 📖 核心功能 (Core Features)
+## 快速开始
 
-*   **智能规划 (Smart Planning)**: 理解模糊的高层需求，将其拆解为有序的、可执行的步骤。
-*   **技能驱动 (Skills-Based)**: 封装了文件操作、代码搜索、测试运行等高层能力，而非低级的 API 调用。
-*   **流式交互 (Streaming UI)**: 全链路支持 Markdown 流式输出，提供即时、美观的终端交互体验。
-*   **自我修正 (Self-Correction)**: 内置 Critic 角色，自动审查执行结果并提出修改建议。
-*   **安全沙箱 (Sandboxed)**: 所有文件操作均限制在安全目录内，并自动过滤敏感或无关文件（如 `.git`, `node_modules`）。
+### 环境要求
 
----
+- Python 3.11+
+- Node.js 18+
 
-## 🚀 快速开始 (Quick Start)
-
-### 1. 环境要求
-
-*   Python 3.10 或更高版本
-*   [uv](https://github.com/astral-sh/uv) (推荐的项目管理工具)
-
-### 2. 安装与配置
-
-我们强烈推荐使用 `uv` 进行依赖管理和环境配置。
+### Docker 部署 (推荐)
 
 ```bash
-# 1. 克隆项目
-git clone https://github.com/XiaoW0417/Code_Agent_Bot
-cd Code_Agent_Bot
+# 克隆项目
+git clone https://github.com/yourusername/agent-bot.git
+cd agent-bot
 
-# 2. 创建并激活虚拟环境 (使用 uv)
-uv venv --python 3.13
-source .venv/bin/activate  # macOS/Linux
-# .venv\Scripts\activate   # Windows
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，填入你的 OpenAI API Key
 
-# 3. 安装依赖
-uv sync
+# 启动服务
+docker-compose up -d
+
+# 访问 http://localhost:8000
 ```
 
-### 3. 配置环境变量
-
-在项目根目录创建 `.env` 文件（参考 `.env.example`）：
-
-```ini
-OPENAI_API_KEY=""
-OPENAI_BASE_URL=""                   # 可选，支持兼容 OpenAI 接口的模型
-OPENAI_MODEL_NAME=""                 # 可选
-```
-
-### 4. 运行 Agent
-
-启动交互式 CLI：
+### 本地开发
 
 ```bash
-uv run main.py
+# 安装后端依赖
+pip install -e ".[dev]"
+
+# 安装前端依赖
+cd frontend && npm install && cd ..
+
+# 配置环境变量
+cp .env.example .env
+
+# 启动后端
+uvicorn src.api.app:app --reload
+
+# 启动前端 (新终端)
+cd frontend && npm run dev
 ```
 
----
+## API 文档
 
-## 💡 使用指南 (Usage Guide)
+启动服务后访问：
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
-Agent 支持两种交互模式，系统会自动根据输入内容进行判断：
+### 主要端点
 
-### 1. 快速通道 (Fast Path)
-适用于无需复杂操作的直接问答。
-> **User**: "解释一下 Python 的 GIL 是什么？"
-> **Agent**: (直接流式输出解释)
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/api/v1/auth/register` | POST | 用户注册 |
+| `/api/v1/auth/login` | POST | 用户登录 |
+| `/api/v1/auth/me` | GET | 获取当前用户 |
+| `/api/v1/sessions` | GET/POST | 会话管理 |
+| `/api/v1/chat/stream` | POST | 流式对话 |
+| `/health` | GET | 健康检查 |
 
-### 2. 复杂任务 (Complex Path)
-涉及文件操作、代码分析或多步骤执行的任务。系统会自动进入规划模式。
-> **User**: "分析当前项目结构，并在 README.md 中生成一个概要。"
-> **Agent**:
-> 1.  **Architect**: 生成 Markdown 格式的执行计划（流式显示）。
-> 2.  **Executor**: 调用 `ExploreProject` 技能扫描文件。
-> 3.  **Executor**: 调用 `EditFile` 技能更新 README。
-> 4.  **Critic**: 审查操作结果。
-
-### 可用技能 (Available Skills)
+## 可用技能
 
 | 技能名称 | 描述 |
-| :--- | :--- |
-| `ExploreProject` | 智能探索项目结构，自动过滤噪音文件。 |
-| `ViewFile` | 读取并展示文件内容。 |
-| `SearchCode` | 使用正则模式全局搜索代码。 |
-| `EditFile` | 创建、覆盖或追加内容到文件。 |
-| `DeleteResource` | 删除文件或目录（需谨慎）。 |
-| `RunTests` | 运行 pytest 测试套件并返回报告。 |
+|----------|------|
+| `ExploreProject` | 智能探索项目结构 |
+| `ViewFile` | 读取文件内容 |
+| `SearchCode` | 正则搜索代码 |
+| `EditFile` | 编辑文件 |
+| `DeleteResource` | 删除资源 |
+| `RunTests` | 运行测试 |
 
----
+## 测试
 
-## 📂 项目结构 (Project Structure)
+```bash
+# 运行所有测试
+pytest tests/ -v
 
-```
-src/
-├── core/               # 核心智能体逻辑
-│   ├── skills/         # Skill 定义与注册 (High-Level 能力封装)
-│   ├── planner.py      # 规划器：负责任务拆解
-│   ├── executor.py     # 执行器：负责调用 Skills
-│   ├── critic.py       # 审查器：负责结果验收
-│   ├── orchestrator.py # 编排器：管理 Agent 协作流程
-│   └── analyzer.py     # 分析器：意图识别与路由
-├── infra/              # 基础设施层
-│   ├── tools/          # 底层原子工具 (文件系统、代码分析等)
-│   └── mcp/            # MCP (Model Context Protocol) 适配器
-└── interface/          # 交互层
-    └── ui/             # 基于 Rich 的高性能终端 UI
+# 运行带覆盖率的测试
+pytest tests/ -v --cov=src --cov-report=html
 ```
 
----
+## 项目结构
 
-## 🛠️ 贡献指南 (Contributing)
+```
+agent-bot/
+├── src/
+│   ├── api/            # FastAPI 应用
+│   ├── core/           # 核心业务逻辑
+│   ├── infra/          # 基础设施
+│   └── interface/      # 交互界面
+├── frontend/           # React 前端
+├── tests/              # 测试套件
+├── docker-compose.yml  # Docker 编排
+└── pyproject.toml      # 项目配置
+```
 
-欢迎扩展 Code Agent Bot 的能力！
+## 安全特性
 
-### 如何新增 Skill
+- JWT 认证（Access Token + Refresh Token）
+- 密码 PBKDF2 哈希
+- 文件沙箱隔离
+- SQL 注入防护
+- CORS 配置
+- 请求验证
 
-1.  **定义**: 在 `src/core/skills/definitions.py` 中继承 `Skill` 基类，实现 `execute` 方法。
-2.  **注册**: 在 `src/core/skills/registry.py` 中将新 Skill 加入注册表。
-3.  **验证**: 运行 Agent，通过自然语言指令测试新能力。
+## 许可证
 
-### 提交规范
-
-*   请确保代码通过 pylint 检查。
-*   新增功能需附带相应的测试用例（如适用）。
-*   提交 PR 前请更新相关文档。
-
+MIT License

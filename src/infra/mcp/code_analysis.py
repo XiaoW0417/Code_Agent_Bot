@@ -1,15 +1,18 @@
 """
-CodeAnalysis MCP Server.
+Code Analysis MCP Server.
 """
 from typing import Any, Dict, List
 
 from src.core.mcp.base import MCPServer, Tool
 from src.infra.tools.code_analysis import (
-    search_in_files, run_pytest, 
+    search_in_files, run_pytest,
     SEARCH_IN_FILE_TOOL_SCHEMA, RUN_PYTEST_TOOL_SCHEMA
 )
 
+
 class CodeAnalysisServer(MCPServer):
+    """MCP Server for code analysis tools."""
+    
     @property
     def name(self) -> str:
         return "code_analysis"
@@ -29,7 +32,7 @@ class CodeAnalysisServer(MCPServer):
     async def call_tool(self, name: str, arguments: Dict[str, Any]) -> Any:
         mapping = {
             "search_in_files": search_in_files,
-            "run_pytest": run_pytest
+            "run_pytest": run_pytest,
         }
         if name not in mapping:
             raise ValueError(f"Unknown tool: {name}")
